@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.report">
+	<!-- 1. 전체 개수 구하기 -->
+	<select id="selectCount" resultType="int">
+		select count(*) from report
+	</select>
+	<!-- 2. 1개 구하기 -->
+	<select id="selectByReportNo" parameterType="int" resultType="ReportVO">
+		select * from report where reportNo=#{reportNo}
+	</select>
+	<!-- 3. 1페이지 구하기 -->
+	<select id="selectList" parameterType="HashMap" resultType="ReportVO">
+		select
+		R.*
+		from
+		(select
+		rownum rnum, Q.*
+		from
+		(SELECT a.*,b.dw FROM REPORT a, (SELECT  REPORTNO,ROUND(SYSDATE- REPORTDATE) dw FROM REPORT)B
+		WHERE a.REPORTNO= b.REPORTNO) Q
+		where
+				<![CDATA[
+				rownum <= #{endNo}) R
+				]]>
+		where
+			<![CDATA[
+			rnum >= #{startNo}
+			]]>
+			order by reportNo desc
+	</select>
+	<!-- 4. 저장 -->
+	<insert id="insert" parameterType="ReportVO">
+		insert into report
+		(reportNo, itemName, reportDate, industryName, analystName, investOpinion, targetPrice,
+		currentPrice, after1MPrice, after3MPrice, after6MPrice, after1YPrice)
+		values
+		(reportNo_seq.nextval, #{itemName}, #{reportDate}, #{industryName}, #{analystName}, #{investOpinion}, #{targetPrice},
+		#{currentPrice}, #{after1MPrice}, #{after3MPrice}, #{after6MPrice}, #{after1YPrice})
+	</insert>
+	<!-- 5. 수정 -->
+	<update id="update" parameterType="ReportVO">
+		update report set 
+		itemName = #{itemName}, reportDate = #{reportDate},	industryName = #{industryName}, analystName = #{analystName},
+		investOpinion = #{investOpinion}, targetPrice = #{targetPrice}, currentPrice = #{currentPrice}, after1MPrice = #{after1MPrice},	
+		after3MPrice = #{after3MPrice},	after6MPrice = #{after6MPrice}, after1YPrice = #{after1YPrice}
+		where reportNo=#{reportNo}
+	</update>
+	
+	<!-- 6. 삭제 -->
+	<delete id="delete" parameterType="ReportVO">
+		delete from report where reportNo=#{reportNo}
+	</delete>
+	
+	<!-- 주가 수정 -->
+	<update id="priceUpdate" parameterType="ReportVO">
+		update report set
+		after1MPrice = #{after1MPrice}, after3MPrice = #{after3MPrice}, after6MPrice = #{after6MPrice},
+		after1YPrice = #{after1YPrice}
+		where reportNo=#{reportNo}
+	</update>
+	
+	<!-- 산업명 테이블 가져오기 -->
+	<select id="industryList" resultType="IndustryVO">
+		select * from industry
+	</select>
+	
+	<!-- 애널리스트 이름 개수 -->
+	<select id="analystNameCount" resultType="Integer">
+		select count(*) from analyst where analystName=#{analystName}
+	</select>
+<!--
+ 	SELECT (TO_CHAR(SYSDATE, 'yyyymmdd') - TO_CHAR(ReportDate, 'yyyymmdd'))
+	FROM REPORT
+	WHERE REPORTNO = 1; 
+-->
+	<!-- 7. 저장할때 받는 번호 
+		select max(reportNo) from report 
+	-->
+</mapper>

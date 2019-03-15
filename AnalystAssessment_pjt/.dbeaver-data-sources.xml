@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data-sources>
+	<data-source id="oracle_thin-168b7583b10-fdd206aca4dd352" provider="oracle" driver="oracle_thin" name="Oracle - xe" save-password="true" read-only="false">
+		<connection host="localhost" port="1521" server="" database="xe" url="jdbc:oracle:thin:@//localhost:1521/xe" user="system" password="Q1RWcCGi" home="C:\app\김란옥\product\11.2.0\dbhome_1" type="dev">
+			<provider-property name="@dbeaver-always-use-dba-views@" value="false"/>
+			<provider-property name="@dbeaver-sid-service@" value="SERVICE"/>
+			<provider-property name="@dbeaver-use-rule-hint@" value="false"/>
+			<provider-property name="@dbeaver-connection-type@" value="BASIC"/>
+			<provider-property name="@dbeaver-check-schema-content@" value="false"/>
+			<provider-property name="@dbeaver-always-show-dba@" value="false"/>
+		</connection>
+	</data-source>
+	<data-source id="oracle_thin-168b7be6a88-5c53881f9cfdc38f" provider="oracle" driver="oracle_thin" name="Oracle - xe (springuser)" save-password="true" read-only="false">
+		<connection host="localhost" port="1521" server="" database="xe" url="jdbc:oracle:thin:@//localhost:1521/xe" user="springuser" password="Q1RWcCGi" home="C:\app\김란옥\product\11.2.0\dbhome_1" type="dev">
+			<provider-property name="@dbeaver-always-use-dba-views@" value="false"/>
+			<provider-property name="@dbeaver-sid-service@" value="SERVICE"/>
+			<provider-property name="@dbeaver-use-rule-hint@" value="false"/>
+			<provider-property name="@dbeaver-connection-type@" value="BASIC"/>
+			<provider-property name="@dbeaver-check-schema-content@" value="false"/>
+			<provider-property name="@dbeaver-always-show-dba@" value="false"/>
+		</connection>
+	</data-source>
+	<filters/>
+</data-sources>

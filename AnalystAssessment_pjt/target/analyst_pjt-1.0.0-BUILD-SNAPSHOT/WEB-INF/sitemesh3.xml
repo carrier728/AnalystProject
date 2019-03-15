@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemesh>
+  <mapping path="/*" decorator="/decorators/decorators2.jsp"/>
+<!--   <mapping path="/signIn" decorator="/decorators/decorators2.jsp"/>
+  <mapping path="/findId" decorator="/decorators/decorators2.jsp"/>
+  <mapping path="/findPw" decorator="/decorators/decorators2.jsp"/>
+  <mapping path="/findIdOk" decorator="/decorators/decorators2.jsp"/>
+  <mapping path="/updateMember" decorator="/decorators/decorators2.jsp"/> -->
+<!--   <mapping path="/index/*" decorator="/decorators/index.jsp"/>
+  <mapping path="/admin/*" decorator="/decorators/adminPage.jsp"/> -->
+   
+  Exclude path from decoration. 
+  <mapping path="/logIn" exclue="true"/>
+  <mapping path="/" exclue="true"/>
+  <mapping path="/index" exclue="true"/>
+  <mapping path="/findPwOk" exclue="true"/><!-- 페이지 넘어가는거 작동안함 -->
+  <!-- <mapping path="/" exclue="true"/> -->
+
+</sitemesh>

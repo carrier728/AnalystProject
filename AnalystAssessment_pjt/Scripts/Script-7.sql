@@ -1,0 +1,2 @@
+
+INSERT INTO INDUSTRY (INDUSTRYIDX, INDUSTRYNAME) VALUES (industryidx_seq.nextval, '화학');

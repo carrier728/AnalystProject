@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.analyst">
+	<!-- 1. 전체 개수 구하기 -->
+	<select id="selectCount" resultType="int">
+		select count(*) from analyst
+	</select>
+	<!-- 2. 1개 구하기 -->
+	<select id="selectByAnalystCode" parameterType="int" resultType="AnalystVO">
+		select * from analyst where analystCode=#{analystCode}
+	</select>
+	<!-- 3. 1페이지 구하기 -->
+	<select id="selectList" parameterType="HashMap" resultType="AnalystVO">
+		select
+		R.*
+		from
+		(select
+		rownum rnum, Q.*
+		from
+		(select * from analyst order by analystCode desc) Q
+		where
+				<![CDATA[
+				rownum <= #{endNo}) R
+				]]>
+		where
+			<![CDATA[
+			rnum >= #{startNo}
+			]]>
+	</select>
+	<!-- 4. 저장 -->
+	<insert id="insert" parameterType="analystVO">
+		insert into analyst
+		(analystCode, analystName, firmName, industryName)
+		values
+		(analystCode_seq.nextval, #{analystName}, #{firmName},
+		#{industryName})
+	</insert>
+	<!-- 5. 수정 -->
+	<update id="update" parameterType="analystVO">
+		update analyst set	analystName = #{analystName},	firmName = #{firmName}, industryName = #{industryName}
+		where analystCode=#{analystCode}
+	</update>
+	<!-- 6. 삭제 -->
+	<delete id="delete" parameterType="int">
+		delete from analyst where analystCode=#{analystCode}
+	</delete>
+
+</mapper>

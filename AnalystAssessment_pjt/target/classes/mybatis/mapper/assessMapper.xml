@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.assess">
+	<!-- 보고서 개수 구하기 -->
+	<select id="countReport" parameterType="String" resultType="Integer">
+		select count(*) from report where analystName = #{analystName}
+	</select>
+	
+	<!-- 기간별 BUY 보고서 개수 한꺼번에 가져오기 -->
+	<select id="countBuyReport" parameterType="String" resultType="CountVO">
+		SELECT
+			count1M.*, count3M.*, count6M.*, count1Y.*
+		FROM 
+			(SELECT count (*) count1M FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER1MPRICE = -1) count1M,
+			(SELECT count (*) count3M FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER3MPRICE = -1) count3M,
+			(SELECT count (*) count6M FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER6MPRICE = -1) count6M,
+			(SELECT count (*) count1Y FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER1YPRICE = -1) count1Y
+	</select>
+	
+	<!-- 기간별 적중 BUY 보고서 개수 한꺼번에 가져오기 -->
+	<select id="countHitBuyReport" parameterType="String" resultType="CountVO">
+		SELECT
+			count1M.*, count3M.*, count6M.*, count1Y.*
+		FROM 
+			(SELECT count (*) count1M FROM report WHERE <![CDATA[ currentPrice < after1MPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER1MPRICE = -1) count1M,
+			(SELECT count (*) count3M FROM report WHERE <![CDATA[ currentPrice < after3MPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER3MPRICE = -1) count3M,
+			(SELECT count (*) count6M FROM report WHERE <![CDATA[ currentPrice < after6MPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER6MPRICE = -1) count6M,
+			(SELECT count (*) count1Y FROM report WHERE <![CDATA[ currentPrice < after1YPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'BUY' AND NOT AFTER1YPRICE = -1) count1Y
+	</select>
+	
+	<!-- 기간별 SELL 보고서 개수 한꺼번에 가져오기 -->
+	<select id="countSellReport" parameterType="String" resultType="CountVO">
+		SELECT
+			count1M.*, count3M.*, count6M.*, count1Y.*
+		FROM 
+			(SELECT count (*) count1M FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER1MPRICE = -1) count1M,
+			(SELECT count (*) count3M FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER3MPRICE = -1) count3M,
+			(SELECT count (*) count6M FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER6MPRICE = -1) count6M,
+			(SELECT count (*) count1Y FROM report WHERE ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER1YPRICE = -1) count1Y
+	</select>
+	
+	<!-- 기간별 적중 SELL 보고서 개수 한꺼번에 가져오기 -->
+	<select id="countHitSellReport" parameterType="String" resultType="CountVO">
+		SELECT
+			count1M.*, count3M.*, count6M.*, count1Y.*
+		FROM 
+			(SELECT count (*) count1M FROM report WHERE <![CDATA[ currentPrice > after1MPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER1MPRICE = -1) count1M,
+			(SELECT count (*) count3M FROM report WHERE <![CDATA[ currentPrice > after3MPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER3MPRICE = -1) count3M,
+			(SELECT count (*) count6M FROM report WHERE <![CDATA[ currentPrice > after6MPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER6MPRICE = -1) count6M,
+			(SELECT count (*) count1Y FROM report WHERE <![CDATA[ currentPrice > after1YPrice]]> AND ANALYSTNAME = #{analystName} AND INVESTOPINION = 'SELL' AND NOT AFTER1YPRICE = -1) count1Y
+	</select>
+	
+	<!-- 최근 보고서 5개 구하기 -->
+	<select id="recentReport" parameterType="String" resultType="ReportVO">
+		SELECT * FROM report WHERE ANALYSTNAME = #{analystName} ORDER BY REPORTDATE desc
+	</select>
+	
+	<!-- BUY 주가 상승률 계산 -->
+	<select id="changeBuyRate" parameterType="String" resultType="ChangeRateVO">
+		SELECT
+			changeRate1M.*, changeRate3M.*, changeRate6M.*, changeRate1Y.*
+		FROM 
+			(SELECT NVL2((sum ((AFTER1MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER1MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate1M FROM REPORT WHERE AFTER1MPRICE != -1 AND INVESTOPINION = 'BUY' AND ANALYSTNAME = #{analystName}) changeRate1M,
+			(SELECT NVL2((sum ((AFTER3MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER3MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate3M FROM REPORT WHERE AFTER3MPRICE != -1 AND INVESTOPINION = 'BUY' AND ANALYSTNAME = #{analystName}) changeRate3M,
+			(SELECT NVL2((sum ((AFTER6MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER6MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate6M FROM REPORT WHERE AFTER6MPRICE != -1 AND INVESTOPINION = 'BUY' AND ANALYSTNAME = #{analystName}) changeRate6M,
+			(SELECT NVL2((sum ((AFTER1YPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER1YPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate1Y FROM REPORT WHERE AFTER1YPRICE != -1 AND INVESTOPINION = 'BUY' AND ANALYSTNAME = #{analystName}) changeRate1Y
+	</select>
+	
+	<!-- SELL 주가 상승률 계산 -->
+	<select id="changeSellRate" parameterType="String" resultType="ChangeRateVO">
+		SELECT
+			changeRate1M.*, changeRate3M.*, changeRate6M.*, changeRate1Y.*
+		FROM 
+			(SELECT NVL2((sum ((AFTER1MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER1MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate1M FROM REPORT WHERE AFTER1MPRICE != -1 AND INVESTOPINION = 'SELL' AND ANALYSTNAME = #{analystName}) changeRate1M,
+			(SELECT NVL2((sum ((AFTER3MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER3MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate3M FROM REPORT WHERE AFTER3MPRICE != -1 AND INVESTOPINION = 'SELL' AND ANALYSTNAME = #{analystName}) changeRate3M,
+			(SELECT NVL2((sum ((AFTER6MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER6MPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate6M FROM REPORT WHERE AFTER6MPRICE != -1 AND INVESTOPINION = 'SELL' AND ANALYSTNAME = #{analystName}) changeRate6M,
+			(SELECT NVL2((sum ((AFTER1YPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),(sum ((AFTER1YPRICE-CURRENTPRICE) / CURRENTPRICE)) / count (*),0) changeRate1Y FROM REPORT WHERE AFTER1YPRICE != -1 AND INVESTOPINION = 'SELL' AND ANALYSTNAME = #{analystName}) changeRate1Y
+	</select>
+	
+	<!-- 기간별 목표가 달성 BUY 보고서 개수 구하기 -->
+	<select id="targetRate" parameterType="String" resultType="CountVO">
+		SELECT
+			count1M.*, count3M.*, count6M.*, count1Y.*
+		FROM 
+			(SELECT count (*) count1M FROM REPORT WHERE INVESTOPINION = 'BUY' AND <![CDATA[ TARGETPRICE <= AFTER1MPRICE ]]> AND ANALYSTNAME=#{anlaystName} AND TARGETPRICE != -1) count1M,
+			(SELECT count (*) count3M FROM	REPORT WHERE INVESTOPINION = 'BUY' AND <![CDATA[ TARGETPRICE <= AFTER3MPRICE ]]> AND ANALYSTNAME=#{anlaystName} AND TARGETPRICE != -1) count3M,
+			(SELECT count (*) count6M FROM	REPORT WHERE INVESTOPINION = 'BUY' AND <![CDATA[ TARGETPRICE <= AFTER6MPRICE ]]>AND ANALYSTNAME=#{anlaystName} AND TARGETPRICE != -1) count6M,
+			(SELECT count (*) count1Y FROM	REPORT WHERE INVESTOPINION = 'BUY' AND <![CDATA[ TARGETPRICE <= AFTER1YPRICE ]]> AND ANALYSTNAME=#{anlaystName} AND NOT TARGETPRICE = -1) count1Y
+	</select>	
+	
+	<!-- 기간별 목표가 달성  SELL 보고서 개수 구하기 -->
+	<select id="targetSellRate" parameterType="String" resultType="CountVO">
+		SELECT
+			count1M.*, count3M.*, count6M.*, count1Y.*
+		FROM 
+			(SELECT count (*) count1M FROM REPORT WHERE INVESTOPINION = 'SELL' AND <![CDATA[ TARGETPRICE <= AFTER1MPRICE ]]> AND ANALYSTNAME=#{anlaystName} AND TARGETPRICE != -1) count1M,
+			(SELECT count (*) count3M FROM	REPORT WHERE INVESTOPINION = 'SELL' AND <![CDATA[ TARGETPRICE <= AFTER3MPRICE ]]> AND ANALYSTNAME=#{anlaystName} AND TARGETPRICE != -1) count3M,
+			(SELECT count (*) count6M FROM	REPORT WHERE INVESTOPINION = 'SELL' AND <![CDATA[ TARGETPRICE <= AFTER6MPRICE ]]>AND ANALYSTNAME=#{anlaystName} AND TARGETPRICE != -1) count6M,
+			(SELECT count (*) count1Y FROM	REPORT WHERE INVESTOPINION = 'SELL' AND <![CDATA[ TARGETPRICE <= AFTER1YPRICE ]]> AND ANALYSTNAME=#{anlaystName} AND NOT TARGETPRICE = -1) count1Y
+	</select>	
+	
+	
+</mapper>
